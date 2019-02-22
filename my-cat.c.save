@@ -24,11 +24,10 @@ int main(int argc, char *argv[])
 		}
 
 		/*Time to print the file!*/
-		/*BUFSIZ is a constant that will allocate the buffer with enough space*/
 		char buffer[BUFSIZ];
 		
 		/*While a character exists, print the character.
-		fgets() outputs a null character at the end of a file,
+		fgets() outputs NULL at the end of a file,
 		so this loop will terminate.*/
 		while(fgets(buffer,sizeof(buffer),fp))
 		{

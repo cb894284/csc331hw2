@@ -15,12 +15,6 @@ int compare(char a[], char b[], size_t n)
 	return 1;
 }
 
-/*get the length of an array*/
-size_t getlength(char a[])
-{
-	return sizeof(a)/sizeof(a[0]);
-}
-
 /*main function*/
 int main(int argc, char *argv[])
 {
@@ -31,13 +25,11 @@ int main(int argc, char *argv[])
 		printf("my-grep: searchterm [file ...]");
 		exit(1);
 	}	
-	/*Initialize the search term*/
-	char searchterm[sizeof(argv[1])] = argv[1];
 
 	/*This loop will iterate through the files, searching each one.
 	 These arguments should be files*/
 	int i;
-	for(i=2;argv[i];++i)
+	for(i=2;argv[i];i++)
 	{
 		/*Open file*/
 		FILE *fp = fopen(argv[i], "r");
@@ -50,18 +42,32 @@ int main(int argc, char *argv[])
 		}
 
 		/*Time to search the file!*/
+		/*BUFSIZ is a constant that will allocate enough space for the buffer*/
 		char buffer[BUFSIZ];
+		char *bufferptr;
+		bufferptr=&buffer[0];
 		
-		/*While a line in a file exists, store that line in buffer*/
-		while(getline(buffer,sizeof(buffer),fp))
-		{
+		size_t buffersize = sizeof(buffer);
+		size_t *buffersizeptr;
+		buffersizeptr = &buffersize;
 
+		/*prime the loop. it will run until the file is completely read.*/
+		getline(&bufferptr,buffersizeptr,fp);
+
+		do
+		{
 		/*These variables will be used in a loop to iterate through the line. Each time it loops, the program will create a new term for buffer and try to match it to the search term. If the match is correct, the line is printed*/
 		int t;
-		size_t searchtermlength = getlength(searchterm);
-		size_t bufferlength = getlength(buffer);
-		/*We don't need to keep searching the line if the length of our buffer is less than the search term. So...*/
-		size_t limit = bufferlength - searchtermlength;
+		/*It's useful to get the length of these arrays*/
+		int searchtermlength=0;
+		int lst;
+		for(lst=0;argv[1][lst];++lst) searchtermlength++;
+		int bufferlength=0;
+		int lb;
+		for(lb=0;buffer[lb];++lb) bufferlength++;
+
+		/*We don't need to keep searching the line if the length of our attempt is less than the search term. So...*/
+		int limit = bufferlength - searchtermlength;
 
 			for(t=0;t<limit;t++)
 			{
@@ -73,9 +79,12 @@ int main(int argc, char *argv[])
 					attempt[x] = buffer[t+x];
 				}
 				/*Now we have an attempt to try to compare to the search. Print this line if the comparison is successful*/
-				if(compare(searchterm,attempt,searchtermlength)) printf(buffer);
+				if(compare(argv[1],attempt,searchtermlength)) printf("%s",buffer);
 			}
+		/*Next line!*/
+		getline(&bufferptr,buffersizeptr,fp);
 		}
+		while(!feof(fp));
 		/*Close file*/
 		fclose(fp);
 	}

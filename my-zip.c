@@ -1,4 +1,4 @@
-/*Cameron Brown, my-cat.c*/
+/*Cameron Brown, my-zip.c*/
 /*Libraries*/
 #include <stdio.h>
 #include <stdlib.h>
@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
 	{
 		/*Open file*/
 		FILE *fp = fopen(argv[i], "r");
-		/*Check that the file was valid and opened.
+		/*Check that the format and file was valid and opened.
 		If not, the program prints out an error message and exits*/
 		if(fp == NULL)
 		{
@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
 			{
 				/*Convert our count to binary!*/
 				int b=decimalToBinary(count);
-				/*Add leading zeros, if the binary value's length is less than 4*/
+				/*Add leading zeros, if the binary value's length is less than 4. snprintf() achieves this.*/
 				char binaryarray[16];
 				snprintf(binaryarray,16,"%04d",b);
 				/*I did not find success with fwrite(). printf() achieves the desired result into stdout (into the .z file)*/
